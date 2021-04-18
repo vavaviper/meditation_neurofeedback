@@ -15,22 +15,27 @@ def main():
     BoardShim.enable_dev_board_logger()
     
     winsound.PlaySound("meditation.mp3", winsound.SND_ASYNC | winsound.SND_ALIAS )
-                       
+
     #setting up brainflow params and board
-    params = BrainFlowInputParams()
-    board_id = BoardIds.GANGLION_BOARD.value
     #comment out ganglion and uncomment synthetic board to do demo without a board
     #board_id = BoardIds.SYNTHETIC_BOARD.value
-    sampling_rate = BoardShim.get_sampling_rate(board_id)
-    board = BoardShim(board_id, params)
-    board.prepare_session()
+
+    params = BrainFlowInputParams ()
+    params.board_id = 1
+    board_id = 1
+    params.serial_port = 'COM3'
+    sampling_rate = BoardShim.get_sampling_rate (board_id)
+    BoardShim.enable_dev_board_logger ()
+
+    board = BoardShim (board_id, params)
+    board.prepare_session ()
+
     board.start_stream()
     BoardShim.log_message(LogLevels.LEVEL_INFO.value, 'start sleeping in the main thread')
     time.sleep(5)
     nfft = DataFilter.get_nearest_power_of_two(sampling_rate)
     data = board.get_board_data()
-    board.stop_stream()
-    board.release_session()
+    
 
     eeg_channels = BoardShim.get_eeg_channels(board_id)
     # second eeg channel of synthetic board is a sine wave at 10Hz, should see huge alpha
@@ -57,7 +62,7 @@ def main():
         counter_2 += 1
         if counter_2 % 5 == 0:
             if max(band_dict) == beta or max(band_dict) == gamma:
-                if rand.randint() % 2 == 0:
+                if rand.randint(0,2) % 2 == 0:
                     playsound('clear mind.m4a')
                 if rand.randint() % 2 == 1:
                     playsound('relax.m4a') 
@@ -150,6 +155,9 @@ def main():
     print('light meditation: ', c_beta, 'mins')
     print('deep meditation: ', c_theta, 'mins')
     print('sleep:', c_delta, 'mins')
+
+    board.stop_stream()
+    board.release_session()
      
 
 if __name__ == "__main__":
