@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import keyboard
 import pandas as pd
 from playsound import playsound
-import winsound
+#import winsound
 import random as rand
 
 from brainflow.board_shim import BoardShim, BrainFlowInputParams, LogLevels, BoardIds
@@ -14,21 +14,21 @@ from brainflow.data_filter import DataFilter, FilterTypes, AggOperations, Window
 def main():
     BoardShim.enable_dev_board_logger()
     
-    winsound.PlaySound("meditation.mp3", winsound.SND_ASYNC | winsound.SND_ALIAS )
+    #winsound.PlaySound("meditation.mp3", winsound.SND_ASYNC | winsound.SND_ALIAS )
 
     #setting up brainflow params and board
     #comment out ganglion and uncomment synthetic board to do demo without a board
     #board_id = BoardIds.SYNTHETIC_BOARD.value
 
-    params = BrainFlowInputParams ()
+    params = BrainFlowInputParams()
     params.board_id = 1
     board_id = 1
     params.serial_port = 'COM3'
-    sampling_rate = BoardShim.get_sampling_rate (board_id)
-    BoardShim.enable_dev_board_logger ()
+    sampling_rate = BoardShim.get_sampling_rate(board_id)
+    BoardShim.enable_dev_board_logger()
 
-    board = BoardShim (board_id, params)
-    board.prepare_session ()
+    board = BoardShim(board_id, params)
+    board.prepare_session()
 
     board.start_stream()
     BoardShim.log_message(LogLevels.LEVEL_INFO.value, 'start sleeping in the main thread')
@@ -57,18 +57,19 @@ def main():
         alpha = DataFilter.get_band_power(psd, 8.0, 12.0)
         theta = DataFilter.get_band_power(psd, 4.0, 8.0)
         delta = DataFilter.get_band_power(psd, 1.0, 4.0)
+        time.sleep(5)
 
         band_dict = {gamma: 'concentration', beta: 'normal', alpha: 'light meditation', theta:'deep meditation', delta: 'sleep'}
         counter_2 += 1
         if counter_2 % 5 == 0:
             if max(band_dict) == beta or max(band_dict) == gamma:
                 if rand.randint(0,2) % 2 == 0:
-                    playsound('clear mind.m4a')
-                if rand.randint() % 2 == 1:
-                    playsound('relax.m4a') 
+                    playsound('clear mind.wav')
+                if rand.randint(0,2) % 2 == 1:
+                    playsound('relax.wav') 
         if counter_2 % 20 == 0:
             if max(band_dict) == theta:
-                playsound('keep going.m4a')
+                playsound('keep going.wav')
 
         if keyboard.is_pressed('space'):
             print('here are your results')
